@@ -12,7 +12,6 @@
 // =============================================================================
 
 Window::Window() {
-    
 }
 Window::Window(ushort width, ushort height, char * title) {
     this->width = width;
@@ -55,4 +54,11 @@ char * Window::getTitle() {
 }
 void Window::setTitle(char * t) {
     this->title = t;
+}
+
+void Window::setAspectRatio(float aspectRatio) {
+    this->aspectRatio = aspectRatio;
+}
+float Window::getAspectRatio() {
+    return this->aspectRatio;
 }

@@ -17,15 +17,18 @@
 // =============================================================================
 
 Writter::Writter() {
-    
+    this->setFontFamilySize(GLUT_BITMAP_HELVETICA_12);
+    this->setColor(1, 1, 1);
 }
+
+
 
 // Methods Implementations
 // =============================================================================
 
 void Writter::print() {
     glColor3f(this->color.red, this->color.green, this->color.blue);
-    glWindowPos3i(this->position.x, this->position.y, -0.1);
+    glRasterPos3f(this->position.x, this->position.y, this->position.z);
     ushort charCounter = 0;
     while (this->message[charCounter] != '\0') {
         charCounter++;
@@ -39,6 +42,7 @@ void Writter::print(char * message) {
     this->setMessage(message);
     this->print();
 }
+
 
 
 // Getters and Setters Implementations
@@ -67,7 +71,7 @@ void Writter::setColor(float red,float green,float blue) {
 struct Writter::Position Writter::getPosition() {
     return this->position;
 }
-void Writter::setPosition(short x, short y, short z) {
+void Writter::setPosition(float x, float y, float z) {
     this->position.x = x;
     this->position.y = y;
     this->position.z = z;

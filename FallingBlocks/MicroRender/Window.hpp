@@ -9,13 +9,22 @@
 #ifndef Window_hpp
 #define Window_hpp
 
-// OpenGL is obsolete in macOS Mojave and above
+// OpenGL Includes
 // =============================================================================
 
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#include <OpenGL/gl.h>
-#include <OpenGl/glu.h>
-#include <GLUT/glut.h>
+#ifdef _WIN32
+    #include <GL/gl.h>
+    #include <GL/glut.h>
+#endif
+#ifdef __linux__
+    #include <GL/gl.h>
+    #include <GL/glut.h>
+#else
+    // OpenGL is deprecated in macOS Mojave and above
+    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    #include <OpenGL/gl.h>
+    #include <GLUT/glut.h>
+#endif
 
 
 
@@ -23,9 +32,6 @@
 // =============================================================================
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
 #include <time.h>
 #ifdef _WIN32
     #include <Windows.h>
@@ -41,12 +47,11 @@
 #include <iostream>
 #include <vector>
 #include <ctime>
-#include <ratio>
 #include <chrono>
 
 
 
-// Type Definitions
+// Type Declarations
 // =============================================================================
 
 typedef unsigned short ushort;
@@ -98,6 +103,10 @@ public:
     
     char * getTitle();
     void setTitle(char * t);
+    
+    void setAspectRatio(float aspectRatio);
+    float getAspectRatio();
+    
 };
 
 // Engine Includes

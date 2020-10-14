@@ -12,7 +12,7 @@
 // =============================================================================
 
 Target::Target() {
-    this->Entity::setPosition(0,0,0);
+    this->Entity::setPosition(10,20,0);
 }
 
 
@@ -20,20 +20,12 @@ Target::Target() {
 // Methods Definitions
 // =============================================================================
 
-void Target::decidePositionWith(Player player) {
-    
-    setPosition();
-    //Verify if the new position is not occupied by the player
-    for (uchar i=199-player.getTailSize(); i<199; i++) {
-        if (this->getPosition().x == player.getAllBodyPosition()[i].x &&
-            this->getPosition().y == player.getAllBodyPosition()[i].y
-        ) {
-            this->setIsActive(false);
-            setPosition();
-            i = 199-player.getTailSize();
-        }
-    }
-    this->setIsActive(true);
+void Target::fall() {
+    this->Entity::setPosition(
+        this->getPosition().x,
+        this->getPosition().y -0.5,
+        0.1
+    );
 }
 
 
@@ -41,12 +33,6 @@ void Target::decidePositionWith(Player player) {
 // Getters and Setters Definitions
 // =============================================================================
 
-void Target::setPosition() {
-    if (! this->getIsActive() ) {
-        this->Entity::setPosition(
-            rand() % SP_SCENERY_ROWS,
-            rand() % SP_SCENERY_COLS,
-            0
-        );
-    }
+void Target::generateNewPosition() {
+    this->Entity::setPosition( rand() % 20, 20, 0.1);
 }

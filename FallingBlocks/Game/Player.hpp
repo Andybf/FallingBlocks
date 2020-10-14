@@ -19,18 +19,12 @@ private:
     // =========================================================================
     
     uchar direction; // clockwise: 0=up, 1=right, 2=down, 3=left
-    uchar tailSize;
-    struct Position {
-        float x;
-        float y;
-        float z;
-    } position[200];
     
     
     
 public:
     
-    // Constructors Declarations
+    // Constructors/Destructors Declarations
     // =========================================================================
     
     Player();
@@ -40,11 +34,8 @@ public:
     // Methods Declarations
     // =========================================================================
     
-    void moveBody();
     void decideDirection();
-    void growTail();
     bool isCollidedWith();
-    bool isCollidedWith(Player player);
     bool isCollidedWith(Entity target);
     
     
@@ -52,17 +43,8 @@ public:
     // Getters and Setters Declarations
     // =========================================================================
     
-    struct Position getHeadPosition();
-    void setHeadPosition(float x, float y, float z);
-    
-    struct Position * getAllBodyPosition();
-    void setAllBodyPosition(float x, float y, float z);
-    
     void setDirection(uchar direction);
     uchar getDirection();
-    
-    uchar getTailSize();
-    void setTailSize(uchar tailSize);
 };
 
 #endif /* Player_hpp */

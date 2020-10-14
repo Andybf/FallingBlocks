@@ -29,6 +29,12 @@ private:
     
 public:
     
+    // Attributes Declarations
+    // =========================================================================
+    char * elapsedTimeMessage;
+    
+    
+    
     // Constructors Declarations
     // =========================================================================
     Game();
@@ -51,6 +57,7 @@ public:
     
     bool getIsScreenMessagesActive();
     void setIsScreenMessageActive(bool isScreenMessageActive);
+    
 };
 
 #endif /* Game_hpp */

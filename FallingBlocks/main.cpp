@@ -6,12 +6,8 @@
 //  Copyright © 2020 Anderson Bucchianico. All rights reserved.
 //
 
-#include "Game.hpp"
-
+#include "Game/Game.hpp"
 int main(int argc, char **argv) {
-    
     new Game(argc, argv);
-    
-
-    return 0;
 }
+

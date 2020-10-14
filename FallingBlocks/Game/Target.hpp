@@ -9,7 +9,7 @@
 #ifndef Target_hpp
 #define Target_hpp
 
-#include "Game.hpp"
+#include "../MicroRender/Entity.hpp"
 
 class Target : public Entity {
     
@@ -29,13 +29,13 @@ public:
     
     // Methods Declarations
     // =========================================================================
-    void decidePositionWith(Player player);
+    void fall();
     
     
     
     // Getters and Setters Declarations
     // =========================================================================
-    void setPosition();
+    void generateNewPosition();
     
     
 };

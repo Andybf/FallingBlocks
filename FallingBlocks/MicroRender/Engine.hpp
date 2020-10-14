@@ -17,13 +17,15 @@ class Engine final : public Window {
     
 private:
     
-    // Attributes
+    // Attributes Declarations
     // =========================================================================
     
     bool    isActive;
-    void ** selectedFont;
-    ushort  framesPerSecond;
-    short   writePointerY;
+    ushort  maximumFramesPerSecond;
+    uchar   keyPressed;
+    uchar   keyReleased;
+    char *  glVendor;
+    char *  glRenderer;
     
     struct Color {
         float red;
@@ -32,14 +34,23 @@ private:
         float alpha;
     } clearColor;
     
-    struct WorldProjection {
+    uchar activeProjectionMode;
+    
+    struct OrthographicProjection {
         float west;
         float east;
         float south;
         float north;
         float behind;
         float front;
-    } worldProjection;
+    } orthoProjection;
+    
+    struct PerspectiveProjection {
+        GLdouble fovy;
+        GLdouble aspect;
+        GLdouble zNear;
+        GLdouble zFar;
+    } perspecProjection;
     
     long programElapsedSeconds;
     long programActualSysTime;
@@ -52,7 +63,7 @@ private:
 
 public:
     
-    // Constructors
+    // Constructors Declarations
     // =========================================================================
     
     Engine();
@@ -60,34 +71,57 @@ public:
     
     
     
-    // Methods
+    // Methods Declarations
     // =========================================================================
     
     void initializeEngine(int argc, char **argv);
-    void startProgramLoop();
+    void defineCallbackFunctions();
     void drawOnScreen(Entity ent);
     virtual void loadGameContentsLoop();
     void reshapeScreen(int w, int h);
     void manageProgramTime();
+    void manageKeyboardResponse();
     void prepareFramebuffer();
     virtual void manageKeyboardActionsListener(uchar keyPressed);
     
     
     
-    // Getters and Setters
+    // Getters and Setters Declarations
     // =========================================================================
     
     bool getIsActive();
     void setIsActive(bool isActive);
     
+    void setClearColor(float red,float green,float blue,float alpha);
+    
+    // ============================================================ PROJECTIONS
+    void setActiveProjectionMode(uchar activeProjectionMode);
+    uchar getActiveProjectionMode();
+    
+    struct OrthographicProjection getOrthoProjection();
+    void setOrthoProjection(float west, float east, float south,
+                            float north, float behind, float front
+                            );
+    
+    struct PerspectiveProjection getPerspecProjection();
+    void setPerspecProjection(GLdouble fovy,
+                              GLdouble aspect,
+                              GLdouble zNear,
+                              GLdouble zFar
+                              );
+    
+    // ============================================================== FRAMERATE
     ushort getFps();
     void setFps(ushort fps);
     
-    struct WorldProjection getWorldProjection();
-    void setWorldProjection(float west, float east, float south, float north, float behind, float front);
+    // ============================================================== KEYBOARDS
+    void setKeyPressed(uchar key);\
+    uchar getKeyPressed();
     
-    void setClearColor(float red,float green,float blue,float alpha);
+    void setKeyReleased(uchar key);
+    uchar getKeyReleased();
     
+    // ================================================================= TIMERS
     float getTimerSeconds();
     float getTimerMinutes();
     float getTimerHours();

@@ -18,7 +18,7 @@ class Writter {
   
 private:
     
-    // Attributes
+    // Attributes Declarations
     // =========================================================================
     
     char * message;
@@ -31,27 +31,29 @@ private:
     } color;
     
     struct Position {
-        short x;
-        short y;
-        short z;
+        GLfloat x;
+        GLfloat y;
+        GLfloat z;
     } position;
     
 public:
     
-    // Constructors
+    // Constructors Declarations
     // =========================================================================
     
     Writter();
     
     
-    // Methods
+    
+    // Methods Declarations
     // =========================================================================
     
     void print();
     void print(char * message);
     
     
-    // Getters and Setters
+    
+    // Getters and Setters Declarations
     // =========================================================================
     
     char * getMessage();
@@ -63,7 +65,7 @@ public:
     void setColor(float red, float green, float blue);
     
     struct Position getPosition();
-    void setPosition(short x, short y, short z);
+    void setPosition(float x, float y, float z);
     
 };
 
