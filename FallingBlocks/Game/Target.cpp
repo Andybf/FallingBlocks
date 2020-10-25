@@ -12,7 +12,7 @@
 // =============================================================================
 
 Target::Target() {
-    this->Entity::setPosition(10,20,0);
+    this->Entity::setPosition(10,20, -0.1);
 }
 
 
@@ -23,9 +23,13 @@ Target::Target() {
 void Target::fall() {
     this->Entity::setPosition(
         this->getPosition().x,
-        this->getPosition().y -0.5,
-        0.1
+        this->getPosition().y - this->speed,
+        -0.1
     );
+}
+
+void Target::generateNewPosition() {
+    this->Entity::setPosition( rand() % 20, 20, -0.1);
 }
 
 
@@ -33,6 +37,10 @@ void Target::fall() {
 // Getters and Setters Definitions
 // =============================================================================
 
-void Target::generateNewPosition() {
-    this->Entity::setPosition( rand() % 20, 20, 0.1);
+void Target::setSpeed(float speed) {
+    this->speed = speed;
+}
+
+float Target::getSpeed() {
+    return this->speed;
 }

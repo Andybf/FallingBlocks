@@ -13,13 +13,15 @@
 // =============================================================================
 
 #ifdef _WIN32
+    #define GLUT_DISABLE_ATEXIT_HACK
     #include <GL/gl.h>
     #include <GL/glut.h>
 #endif
 #ifdef __linux__
     #include <GL/gl.h>
     #include <GL/glut.h>
-#else
+#endif
+#ifdef __APPLE__
     // OpenGL is deprecated in macOS Mojave and above
     #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     #include <OpenGL/gl.h>
@@ -48,6 +50,7 @@
 #include <vector>
 #include <ctime>
 #include <chrono>
+#include<thread> 
 
 
 

@@ -12,7 +12,7 @@ Engine engine;
 Game game;
 Entity scenery;
 Player player;
-Target target;
+std::vector<Target> targets;
 Writter wt;
 
 
@@ -38,47 +38,58 @@ Game::Game(int argc, char **argv) {
 
 void Game::Initialize(int argc, char **argv) {
     
+    game = *this;
+    
     std::vector<GLfloat> vector {
+        +0.1f, +0.1f, 0,
         +0.1f, +0.9f, 0,
         +0.9f, +0.9f, 0,
         +0.9f, +0.1f, 0,
-        +0.1f, +0.1f, 0
     };
     player = Player();
-    player.Player::setPosition(10, 0, 0.1);
+    player.Player::setPosition(10, 0, -0.1);
     player.setIsActive(true);
     player.setVectorPointers(vector);
     player.setColor(0.44,0.85,0.21,0);
     
-    target = Target();
-    target.setIsActive(true);
-    target.Target::generateNewPosition();
-    target.setVectorPointers(vector);
-    target.setColor(0.76, 0.33, 0.81, 0.0);
+    for (char x=0; x<5; x++) {
+        targets.push_back(Target());
+        targets[x].setIsActive(true);
+        targets[x].setSpeed(Engine::randomNumberBetween(0.25f, 1));
+        targets[x].Target::generateNewPosition();
+        targets[x].setVectorPointers(vector);
+        targets[x].setColor(0.76, 0.33, 0.81, 0.0);
+    }
     
     scenery = Entity();
-    scenery.setColor(0.1, 0.1, 0.1, 0);
+    scenery.setColor(0.2, 0.2, 0.2, 0);
     scenery.setIsActive(true);
     scenery.setObjectType(GL_LINE_STRIP);
     scenery.setVectorPointers( std::vector<GLfloat> {
+        +0.0f, +0.0f, 0,
         +0.0f, +1.0f, 0,
         +1.0f, +1.0f, 0,
         +1.0f, +0.0f, 0,
-        +0.0f, +0.0f, 0
+        +0.0f, +0.0f, 0,
     });
     
-    wt = Writter();
-    
     Window * win = new Window(480, 480, (char*)"FallingBlocks");
+    
+    Camera camera = Camera();
+    camera.setOrthoProjection(0, SP_SCENERY_COLS, 0, SP_SCENERY_ROWS, -20, 20);
+    camera.setPerspecProjection(90, win->getAspectRatio(), 1, 20.0);
+    camera.setActiveProjectionMode(0x1);
+    camera.setEyePosition(10, 6, 12);
+    camera.setReferencePoint(10, 25, -50);
+    
+    wt = Writter(camera);
+    
     engine = Engine(*win);
-    engine.setFps(5);
+    engine.setCamera(camera);
+    engine.setMaxFps(30);
     engine.setClearColor(0.08, 0.08, 0.08, 0);
     engine.initializeEngine(argc, argv);
-    engine.setOrthoProjection(0, SP_SCENERY_COLS, 0, SP_SCENERY_ROWS, -20, 20);
-    engine.setPerspecProjection(90, engine.getAspectRatio(), 0.0, 100.0);
-    engine.setActiveProjectionMode(0x0);
-    engine.defineCallbackFunctions();
-    game = *this;
+    engine.startRenderingLoop();
 }
 
 void Game::restart() {
@@ -90,23 +101,21 @@ void Game::restart() {
     engine.setTimerSeconds(0);
     engine.setIsActive(true);
     
-    target.setIsActive(true);
 }
 
 void Game::GameOver() {
-    Writter wt = Writter();
-    wt.setColor(1, 1, 1);
     wt.setFontFamilySize(GLUT_BITMAP_HELVETICA_18);
     
-    wt.setPosition(engine.getWidth()/2-50, engine.getHeight()/2, -0.1f);
+    wt.setPosition(8, 10, -0.1);
     wt.print((char*)"Game Over");
     
-    wt.setPosition(engine.getWidth()/2-75, engine.getHeight()/2-20, -0.1f);
+    wt.setPosition(8, 9, -0.1);
     wt.print((char*)"Press r to restart");
     
-    wt.setPosition(engine.getWidth()/2-40, engine.getHeight()/2-40, -0.1f);
+    wt.setPosition(8, 8, -0.1);
     wt.print((char*)"q to quit");
     
+    wt.setFontFamilySize(GLUT_BITMAP_HELVETICA_12);
     engine.setIsActive(false);
 }
 
@@ -140,19 +149,22 @@ void Engine::loadGameContentsLoop() {
     // Messages on screen loop
     if (game.getIsScreenMessagesActive()) {
         
-        wt.setPosition(0.25, 19.5, 1);
+        wt.setPosition(0.25, 19.5, -0.1);
         wt.print(engine.glRenderer);
         
-        wt.setPosition(0.25, 19, 1);
+        wt.setPosition(0.25, 19, -0.1);
         wt.print(engine.glVendor);
         
-        wt.setPosition(0.25, 18.5, 1);
+        wt.setPosition(0.25, 18.5, -0.1);
+        wt.print(engine.glVersion);
+        
+        wt.setPosition(0.25, 17.5, -0.1);
         game.elapsedTimeMessage = (char*)calloc(10,sizeof(char*));
         sprintf(game.elapsedTimeMessage, "Time: %02.0f:%02.0f",this->getTimerMinutes(),this->getTimerSeconds());
         wt.print(game.elapsedTimeMessage);
         free(game.elapsedTimeMessage);
         
-        wt.setPosition(0.25, 18, 1);
+        wt.setPosition(0.25, 17, -0.1);
         char * pointsMsg = (char*)calloc(20,sizeof(char*));
         sprintf(pointsMsg, "Points: %i",game.getPoints());
         wt.print(pointsMsg);
@@ -165,24 +177,31 @@ void Engine::loadGameContentsLoop() {
         if (player.isCollidedWith() ) {
             // TODO
         }
-        if (player.isCollidedWith(target)) {
-            game.setPoints(game.getPoints()+1);
+        
+        for (char x=0; x<targets.size(); x++) {
+            if (player.isCollidedWith(targets[x])) {
+               game.GameOver();
+            }
+            targets[x].fall();
+            if (targets[x].getPosition().y < 0) {
+                targets[x].generateNewPosition();
+                targets[x].setSpeed(Engine::randomNumberBetween(0.25f, 1));
+                game.setPoints(game.getPoints()+1);
+            }
         }
-        Engine::drawOnScreen(player);
     } else {
         game.GameOver();
     }
     
-    target.fall();
-    Engine::drawOnScreen(target);
-    if (target.getPosition().y < 0) {
-        target.generateNewPosition();
+    for (char x=0; x<targets.size(); x++) {
+        Engine::drawOnScreen(targets[x]);
     }
+    Engine::drawOnScreen(player);
     
-    for (char x=0; x<SP_SCENERY_COLS; x++) {
-        for (char y=0; y<SP_SCENERY_ROWS; y++) {
+    for (float x=0; x<SP_SCENERY_COLS; x++) {
+        for (float y=0; y<SP_SCENERY_ROWS; y++) {
+            scenery.setPosition(x, y, -0.2);
             Engine::drawOnScreen(scenery);
-            scenery.setPosition(x, y, 0);
         }
     }
 }

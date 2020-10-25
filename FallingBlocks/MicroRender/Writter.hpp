@@ -13,6 +13,7 @@
 // =============================================================================
 
 #include "Window.hpp"
+#include "../MicroRender/Camera.hpp"
 
 class Writter {
   
@@ -20,6 +21,8 @@ private:
     
     // Attributes Declarations
     // =========================================================================
+    
+    Camera camera;
     
     char * message;
     void * font;
@@ -42,7 +45,8 @@ public:
     // =========================================================================
     
     Writter();
-    
+    Writter(Camera camera);
+        
     
     
     // Methods Declarations
@@ -50,6 +54,9 @@ public:
     
     void print();
     void print(char * message);
+    
+    void setCamera(Camera camera);
+    
     
     
     

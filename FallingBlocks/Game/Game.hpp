@@ -11,6 +11,7 @@
 
 #include "../MicroRender/Engine.hpp"
 #include "../MicroRender/Writter.hpp"
+#include "../MicroRender/Camera.hpp"
 #include "Player.hpp"
 #include "Target.hpp"
 

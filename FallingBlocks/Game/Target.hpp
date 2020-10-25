@@ -18,7 +18,7 @@ private:
     // Attributes Declarations
     // =========================================================================
     
-    
+    float speed;
     
 public:
     
@@ -30,12 +30,13 @@ public:
     // Methods Declarations
     // =========================================================================
     void fall();
-    
+    void generateNewPosition();
     
     
     // Getters and Setters Declarations
     // =========================================================================
-    void generateNewPosition();
+    void setSpeed(float speed);
+    float getSpeed();
     
     
 };

@@ -21,12 +21,27 @@ Writter::Writter() {
     this->setColor(1, 1, 1);
 }
 
+Writter::Writter(Camera camera) {
+    this->camera = camera;
+    this->setFontFamilySize(GLUT_BITMAP_HELVETICA_12);
+    this->setColor(1, 1, 1);
+}
+
 
 
 // Methods Implementations
 // =============================================================================
 
 void Writter::print() {
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    this->camera.useOrthographicProjection();
+    this->camera.setEyePosition(0, 0, 1);
+    this->camera.setReferencePoint(0, 0, 0);
+    this->camera.updatePosition();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    
     glColor3f(this->color.red, this->color.green, this->color.blue);
     glRasterPos3f(this->position.x, this->position.y, this->position.z);
     ushort charCounter = 0;
@@ -36,6 +51,15 @@ void Writter::print() {
     for (int i=0; i<charCounter; i++) {
         glutBitmapCharacter(this->font, this->message[i]);
     }
+    
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    this->camera.usePerspectiveProjection();
+    this->camera.setEyePosition(10, 6, 12);
+    this->camera.setReferencePoint(10, 25, -50);
+    this->camera.updatePosition();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 }
 
 void Writter::print(char * message) {
@@ -47,6 +71,10 @@ void Writter::print(char * message) {
 
 // Getters and Setters Implementations
 // =============================================================================
+
+void Writter::setCamera(Camera camera) {
+    this->camera = camera;
+}
 
 char * Writter::getMessage() {
     return this->message;

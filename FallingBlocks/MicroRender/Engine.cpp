@@ -15,7 +15,7 @@ Engine * eng;
 
 
 
-// Static Functions Implementations
+// Static Callback Functions Implementations
 // =============================================================================
 
 void keyPressedCallback(uchar key, GLint x, GLint y) {
@@ -66,7 +66,6 @@ Engine::Engine(Window win) {
     this->clearColor.alpha = 0.00;
     
     this->isActive = true;
-    activeProjectionMode = 0x0;
 }
 
 
@@ -78,29 +77,32 @@ void Engine::initializeEngine(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH );
     glutInitWindowSize(this->Window::getWidth(), this->Window::getHeight());
-    glutInitWindowPosition(this->Window::getWidth()/2,
-                           this->Window::getHeight()/2
-                           );
+    glutInitWindowPosition(
+        this->Window::getWidth()/2,
+        this->Window::getHeight()/2
+    );
     glutCreateWindow(this->Window::getTitle());
-    glClearColor(this->clearColor.red,
-                 this->clearColor.green,
-                 this->clearColor.blue,
-                 this->clearColor.alpha
-                 );
+    glClearColor(
+        this->clearColor.red,
+        this->clearColor.green,
+        this->clearColor.blue,
+        this->clearColor.alpha
+    );
     glEnable( GL_DEPTH_TEST );
     glDepthFunc( GL_LEQUAL );
-    eng = this;
-}
-
-void Engine::defineCallbackFunctions() {
     glutKeyboardFunc(keyPressedCallback);
     glutKeyboardUpFunc(keyReleaseCallback);
     glutMouseFunc(NULL);
     glutReshapeFunc(reshapeCallback);
     glutDisplayFunc(displayCallback);
     glutTimerFunc(0,timerCallback,0);
-    this->glVendor = (char*)glGetString(GL_VENDOR);
+    eng = this;
+}
+
+void Engine::startRenderingLoop() {
+    this->glVendor   = (char*)glGetString(GL_VENDOR);
     this->glRenderer = (char*)glGetString(GL_RENDERER);
+    this->glVersion  = (char*)glGetString(GL_VERSION);
     glutMainLoop();
 }
 
@@ -108,30 +110,15 @@ void Engine::reshapeScreen(int width, int height) {
     glViewport(0.0, 0.0, (GLsizei)width, (GLsizei)height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    if (this->activeProjectionMode == 0x0) {
-        glOrtho(
-            this->orthoProjection.west,
-            this->orthoProjection.east,
-            this->orthoProjection.south,
-            this->orthoProjection.north,
-            this->orthoProjection.behind,
-            this->orthoProjection.front
-        );
-    } else if (this->activeProjectionMode == 0x1) {
-        gluPerspective(
-            this->perspecProjection.fovy,
-            this->perspecProjection.aspect,
-            this->perspecProjection.zNear,
-            this->perspecProjection.zFar
-        );
+    if (camera.getActiveProjectionMode() == 0x0) {
+        camera.useOrthographicProjection();
+    } else if (camera.getActiveProjectionMode() == 0x1) {
+        camera.usePerspectiveProjection();
     }
+    camera.updatePosition();
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(
-        0.0, 0.0, 1,  // eyeX, eyeY, eyeZ Specifies the position of the eye point.
-        0.0, 0.0, 0, // centerX, centerY, centerZ Specifies the position of the reference point.
-        0.0,  1.0,  0.0 // upX, upY, upZ  Specifies the direction of the up vector.
-    );
+
     this->Window::setWidth(width);
     this->Window::setHeight(height);
 }
@@ -157,7 +144,11 @@ void Engine::manageProgramTime() {
 
 void Engine::drawOnScreen(Entity ent) {
     if (ent.getIsActive()) {
-        glColor3f(ent.getColor().red, ent.getColor().green, ent.getColor().blue);
+        glColor3f(
+            ent.getColor().red,
+            ent.getColor().green,
+            ent.getColor().blue
+        );
         glPushMatrix();
         glRotatef(ent.getRotation().angle,
             ent.getRotation().x,
@@ -192,14 +183,25 @@ void Engine::prepareFramebuffer() {
 }
 
 
+float Engine::randomNumberBetween(float min, float max) {
+    float random = 0.0f;
+    while (random < 0.25f) {
+        random = (float)(rand() % 10) / 10;
+    }
+    return random;
+}
  
 // Getters and Setters Implementations
 // =============================================================================
 
+void Engine::setCamera(Camera camera) {
+    this->camera = camera;
+}
+
 void Engine::setClearColor(float red,float green,float blue,float alpha) {
-    this->clearColor.red = red;
+    this->clearColor.red   = red;
     this->clearColor.green = green;
-    this->clearColor.blue = blue;
+    this->clearColor.blue  = blue;
     this->clearColor.alpha = alpha;
 }
 
@@ -210,45 +212,12 @@ void Engine::setIsActive(bool isActive) {
     this->isActive = isActive;
 }
 
-// ================================================================ PROJECTIONS
-
-void Engine::setActiveProjectionMode(uchar activeProjectionMode) {
-    this->activeProjectionMode = activeProjectionMode;
-}
-uchar Engine::getActiveProjectionMode() {
-    return this->activeProjectionMode;
-}
-
-struct Engine::OrthographicProjection Engine::getOrthoProjection() {
-    return this->orthoProjection;
-}
-void Engine::setOrthoProjection(float west, float east, float south,
-                                float north, float behind, float front) {
-    this->orthoProjection.west    = west;
-    this->orthoProjection.east    = east;
-    this->orthoProjection.south   = south;
-    this->orthoProjection.north   = north;
-    this->orthoProjection.behind  = behind;
-    this->orthoProjection.front   = front;
-}
-
-struct Engine::PerspectiveProjection Engine::getPerspecProjection() {
-    return this->perspecProjection;
-}
-void Engine::setPerspecProjection(GLdouble fovy, GLdouble aspect,
-                                  GLdouble zNear, GLdouble zFar) {
-    this->perspecProjection.fovy   = fovy;
-    this->perspecProjection.aspect = aspect;
-    this->perspecProjection.zNear  = zNear;
-    this->perspecProjection.zFar   = zFar;
-}
-
 // ================================================================== FRAMERATE
 
 ushort Engine::getFps() {
     return this->maximumFramesPerSecond;
 }
-void Engine::setFps(ushort fps) {
+void Engine::setMaxFps(ushort fps) {
     this->maximumFramesPerSecond = fps;
 }
 

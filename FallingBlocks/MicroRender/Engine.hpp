@@ -10,6 +10,7 @@
 #define Engine_hpp
 
 #include "Window.hpp"
+#include "Camera.hpp"
 
 #define MR_ONE_SECOND_IN_MS 1000
 
@@ -20,12 +21,16 @@ private:
     // Attributes Declarations
     // =========================================================================
     
+    Camera camera;
+    
     bool    isActive;
     ushort  maximumFramesPerSecond;
     uchar   keyPressed;
     uchar   keyReleased;
+    
     char *  glVendor;
     char *  glRenderer;
+    char *  glVersion;
     
     struct Color {
         float red;
@@ -33,24 +38,6 @@ private:
         float blue;
         float alpha;
     } clearColor;
-    
-    uchar activeProjectionMode;
-    
-    struct OrthographicProjection {
-        float west;
-        float east;
-        float south;
-        float north;
-        float behind;
-        float front;
-    } orthoProjection;
-    
-    struct PerspectiveProjection {
-        GLdouble fovy;
-        GLdouble aspect;
-        GLdouble zNear;
-        GLdouble zFar;
-    } perspecProjection;
     
     long programElapsedSeconds;
     long programActualSysTime;
@@ -75,14 +62,17 @@ public:
     // =========================================================================
     
     void initializeEngine(int argc, char **argv);
-    void defineCallbackFunctions();
+    void startRenderingLoop();
     void drawOnScreen(Entity ent);
-    virtual void loadGameContentsLoop();
     void reshapeScreen(int w, int h);
     void manageProgramTime();
     void manageKeyboardResponse();
     void prepareFramebuffer();
+    
+    virtual void loadGameContentsLoop();
     virtual void manageKeyboardActionsListener(uchar keyPressed);
+    
+    static float randomNumberBetween(float min, float max);
     
     
     
@@ -92,27 +82,13 @@ public:
     bool getIsActive();
     void setIsActive(bool isActive);
     
+    void setCamera(Camera camera);
+    
     void setClearColor(float red,float green,float blue,float alpha);
-    
-    // ============================================================ PROJECTIONS
-    void setActiveProjectionMode(uchar activeProjectionMode);
-    uchar getActiveProjectionMode();
-    
-    struct OrthographicProjection getOrthoProjection();
-    void setOrthoProjection(float west, float east, float south,
-                            float north, float behind, float front
-                            );
-    
-    struct PerspectiveProjection getPerspecProjection();
-    void setPerspecProjection(GLdouble fovy,
-                              GLdouble aspect,
-                              GLdouble zNear,
-                              GLdouble zFar
-                              );
     
     // ============================================================== FRAMERATE
     ushort getFps();
-    void setFps(ushort fps);
+    void setMaxFps(ushort fps);
     
     // ============================================================== KEYBOARDS
     void setKeyPressed(uchar key);\

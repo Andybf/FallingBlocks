@@ -45,8 +45,8 @@ bool Player::isCollidedWith() { //Player Colision on the walls
 
 bool Player::isCollidedWith(Entity target) {
     return
-        this->getPosition().x == target.getPosition().x &&
-        this->getPosition().y == target.getPosition().y;
+        (short)this->getPosition().x == (short)target.getPosition().x &&
+        (short)this->getPosition().y == (short)target.getPosition().y;
 }
 
 

@@ -13,7 +13,8 @@ specification  = -std=c++11
 executableName = FallingBlocks
 files          = main.cpp Game/Game.cpp Game/Player.cpp Game/Target.cpp \
 					MicroRender/Window.cpp MicroRender/Engine.cpp \
-					MicroRender/Entity.cpp MicroRender/Writter.cpp
+					MicroRender/Entity.cpp MicroRender/Writter.cpp \
+					MicroRender/Camera.cpp
 
 UNAME := $(shell uname)
 
@@ -33,11 +34,19 @@ All:
 	mv Contents $(executableName).app
 	chmod 777 $(executableName).app/*
 	
-else
+else ifeq ($(UNAME), Linux) # Linux
 
 frameworks = -lGL -lGLU -lglut
 
 All:
 	$(compiler) $(specification) $(operation) $(executableName) $(files) $(frameworks)
 	
+else # Windows
+
+executableName = FallingBlocks.exe
+frameworks = -lglu32 -lopengl32 -lfreeglut
+
+All:
+	$(compiler) $(specification) $(operation) $(executableName) $(files) $(frameworks)
+
 endif
